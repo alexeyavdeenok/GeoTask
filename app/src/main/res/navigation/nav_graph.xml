@@ -5,52 +5,96 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/taskListFragment">
 
-    <!-- Главный экран со списком задач -->
+    <!-- ==================== ОСНОВНЫЕ ЭКРАНЫ (с нижней панелью) ==================== -->
+
     <fragment
         android:id="@+id/taskListFragment"
         android:name="com.geotask.presentation.ui.tasks.TaskListFragment"
         android:label="Задачи"
         tools:layout="@layout/places">
 
-        <!-- ← Вот это добавляем! Переход вперёд из списка задач -->
+        <!-- Переход на создание задачи -->
         <action
             android:id="@+id/action_taskListFragment_to_taskCreateFragment"
             app:destination="@id/taskCreateFragment" />
+    </fragment>
 
-        <!-- Можно добавить анимации, если хочешь -->
-        <!-- app:enterAnim="@anim/slide_in_right" -->
-        <!-- app:exitAnim="@anim/slide_out_left" -->
-        <!-- app:popEnterAnim="@anim/slide_in_left" -->
-        <!-- app:popExitAnim="@anim/slide_out_right" -->
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.geotask.presentation.ui.map.MapFragment"
+        android:label="Карта"
+        tools:layout="@layout/choose_place" />
+
+    <fragment
+        android:id="@+id/locationListFragment"
+        android:name="com.geotask.presentation.ui.locations.LocationListFragment"
+        android:label="Места"
+        tools:layout="@layout/places">
+
+        <action
+            android:id="@+id/action_locationListFragment_to_locationCreateFragment"
+            app:destination="@id/locationCreateFragment"/>
+    </fragment>   <!-- или map_place, если другой -->
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.geotask.presentation.ui.settings.SettingsFragment"
+        android:label="Настройки"
+        tools:layout="@layout/settings" />
+
+    <fragment
+        android:id="@+id/mapPlacesFragment"
+        android:name="com.geotask.presentation.ui.locations.MapPlacesFragment"
+        android:label="локации на карте">
 
     </fragment>
 
-    <!-- Создание задачи -->
+    <!-- ==================== ЭКРАНЫ БЕЗ НИЖНЕЙ ПАНЕЛИ (открываются поверх) ==================== -->
+
     <fragment
         android:id="@+id/taskCreateFragment"
         android:name="com.geotask.presentation.ui.tasks.TaskCreateFragment"
         android:label="Новая задача"
         tools:layout="@layout/add_task">
 
+        <!-- Возврат назад на список задач -->
         <action
-            android:id="@+id/action_taskCreate_to_taskList"
+            android:id="@+id/action_taskCreateFragment_to_taskListFragment"
             app:destination="@id/taskListFragment"
             app:popUpTo="@id/taskListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />   <!-- false — чтобы не закрывать весь стек -->
     </fragment>
 
-    <!-- Детали задачи -->
     <fragment
         android:id="@+id/taskDetailFragment"
         android:name="com.geotask.presentation.ui.tasks.TaskDetailFragment"
-        android:label="Задача"
+        android:label="Детали задачи"
         tools:layout="@layout/about_task">
 
         <action
-            android:id="@+id/action_taskDetail_to_taskList"
+            android:id="@+id/action_taskDetailFragment_to_taskListFragment"
             app:destination="@id/taskListFragment"
             app:popUpTo="@id/taskListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/locationCreateFragment"
+        android:name="com.geotask.presentation.ui.locations.LocationCreateFragment"
+        android:label="Добавить локацию">
+
+        <action
+            android:id="@+id/action_locationCreateFragment_to_locationListFragment"
+            app:destination="@+id/locationListFragment"
+            app:popUpTo="@id/locationCreateFragment"
+            app:popUpToInclusive="false"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/locationDetailFragment"
+        android:name="com.geotask.presentation.ui.locations.LocationDetailFragment"
+        android:label="О локации">
+
     </fragment>
 
 </navigation>
