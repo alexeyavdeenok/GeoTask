@@ -1,0 +1,109 @@
+<resources>
+    <style name="Theme.GeoTask" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <style name="AppButton.Main" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/main_height</item>
+
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">0dp</item>
+
+        <item name="android:background">@drawable/bg_task_item</item>
+        <item name="backgroundTint">@null</item> <item name="android:elevation">@dimen/main_elevation</item>
+
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#1C1B1F</item>
+        <item name="android:gravity">center</item>
+
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="AppButton.Add" parent="AppButton.Main">
+        <item name="backgroundTint">@color/purple_add</item>
+
+        <item name="icon">@drawable/baseline_add_24</item>
+
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+
+        <item name="iconTint">#000000</item>
+        <item name="rippleColor">#40FFFFFF</item>
+    </style>
+
+    <style name="AppButton.ChoosePlace" parent="AppButton.Main">
+        <item name="android:background">@drawable/bg_dashed_border</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:text">@string/choose_place</item>
+
+        <item name="android:elevation">@dimen/main_elevation</item>
+
+        <item name="android:textColor">#9E9E9E</item>
+
+        <item name="icon">@null</item>
+
+        <item name="rippleColor">#15000000</item>
+    </style>
+
+    <style name="AppButton.Completed" parent="AppButton.Main">
+        <item name="backgroundTint">#E8F5E9</item>
+
+        <item name="android:textColor">#2E7D32</item>
+        <item name="android:text">@string/task_complete</item>
+        <item name="icon">@drawable/ic_check</item> <item name="iconTint">#2E7D32</item>      <item name="iconSize">24dp</item>
+
+        <item name="iconGravity">textStart</item>  <item name="iconPadding">12dp</item>       <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="AppButton.ChangePlace" parent="AppButton.ChoosePlace">
+        <item name="android:text">@string/change_place</item>
+
+    </style>
+
+    <style name="AppButton.DeleteTask" parent="AppButton.Main">
+        <item name="backgroundTint">#F36A6A</item>
+
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:text">@string/delete_task</item>
+
+        <item name="icon">@drawable/ic_delete</item>
+        <item name="iconTint">#FFFFFF</item> <item name="iconSize">24dp</item>
+
+        <item name="iconGravity">textStart</item>  <item name="iconPadding">12dp</item>       <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+
+        <item name="rippleColor">#40FFFFFF</item>
+    </style>
+
+    <style name="AppButton.DeletePlace" parent="AppButton.DeleteTask">
+
+        <item name="android:text">@string/delete_place</item>
+
+    </style>
+
+    <style name="AppButton.Location" parent="AppButton.Main">
+        <item name="backgroundTint">@color/purple</item>
+
+        <item name="android:textColor">#FFFFFF</item>
+
+        <item name="icon">@drawable/ic_location</item>
+        <item name="iconTint">#FFFFFF</item>
+        <item name="iconSize">24dp</item>
+
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">12dp</item>
+
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+
+        <item name="rippleColor">#40FFFFFF</item>
+
+    </style>
+
+</resources>

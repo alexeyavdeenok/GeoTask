@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/taskListFragment">
+
+    <!-- Главный экран со списком задач -->
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="com.geotask.presentation.ui.tasks.TaskListFragment"
+        android:label="Задачи"
+        tools:layout="@layout/places">
+
+        <!-- ← Вот это добавляем! Переход вперёд из списка задач -->
+        <action
+            android:id="@+id/action_taskListFragment_to_taskCreateFragment"
+            app:destination="@id/taskCreateFragment" />
+
+        <!-- Можно добавить анимации, если хочешь -->
+        <!-- app:enterAnim="@anim/slide_in_right" -->
+        <!-- app:exitAnim="@anim/slide_out_left" -->
+        <!-- app:popEnterAnim="@anim/slide_in_left" -->
+        <!-- app:popExitAnim="@anim/slide_out_right" -->
+
+    </fragment>
+
+    <!-- Создание задачи -->
+    <fragment
+        android:id="@+id/taskCreateFragment"
+        android:name="com.geotask.presentation.ui.tasks.TaskCreateFragment"
+        android:label="Новая задача"
+        tools:layout="@layout/add_task">
+
+        <action
+            android:id="@+id/action_taskCreate_to_taskList"
+            app:destination="@id/taskListFragment"
+            app:popUpTo="@id/taskListFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Детали задачи -->
+    <fragment
+        android:id="@+id/taskDetailFragment"
+        android:name="com.geotask.presentation.ui.tasks.TaskDetailFragment"
+        android:label="Задача"
+        tools:layout="@layout/about_task">
+
+        <action
+            android:id="@+id/action_taskDetail_to_taskList"
+            app:destination="@id/taskListFragment"
+            app:popUpTo="@id/taskListFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+</navigation>

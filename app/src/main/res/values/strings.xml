@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">GeoTask</string>
+    <string name="choose_place">+ Выбрать местоположение</string>
+    <string name="task_complete">Задача выполнена</string>
+    <string name="delete_task">Удалить задачу</string>
+    <string name="delete_place">Удалить местоположение</string>
+    <string name="change_place">Сменить местоположение</string>
+    <string name="tasks">Задачи</string>
+    <string name="places">Места</string>
+    <string name="settings">Настройки</string>
+</resources>
+
