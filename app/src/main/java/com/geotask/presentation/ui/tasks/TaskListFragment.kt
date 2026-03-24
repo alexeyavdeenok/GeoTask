@@ -23,6 +23,12 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {  // ← вот 
             )
         }
 
+        view.findViewById<View>(R.id.btnTask).setOnClickListener {
+            findNavController().navigate(
+                TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment()
+            )
+        }
+
         // В будущем клик по элементам списка и т.д.
     }
 }

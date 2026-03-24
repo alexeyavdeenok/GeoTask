@@ -19,12 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:paddingBottom="32dp">
 
+            <!-- Погода -->
             <include
                 android:id="@+id/weather"
                 layout="@layout/weather" />
 
+            <!-- ==================== СЕКЦИЯ С GPS ==================== -->
             <LinearLayout
                 android:id="@+id/containerTasksWithGps"
                 android:layout_width="match_parent"
@@ -32,43 +34,55 @@
                 android:orientation="vertical"
                 android:paddingTop="8dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTask"
+                <!-- RecyclerView с wrap_content -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerWithGps"
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="4dp"
-                    android:text="Вынести мусор"
-                    style="@style/AppButton.Main" />
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+                <!-- Кнопка сразу после списка -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddTaskLocation"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="4dp"
+                    android:layout_marginTop="12dp"
                     style="@style/AppButton.Add" />
+
             </LinearLayout>
 
+            <!-- Иконка разделителя -->
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_margin="16dp"
+                android:layout_marginVertical="24dp"
                 android:src="@drawable/ic_location_off" />
 
+            <!-- ==================== СЕКЦИЯ БЕЗ GPS ==================== -->
             <LinearLayout
                 android:id="@+id/containerTasksNoGps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="64dp"
                 android:orientation="vertical">
 
+                <!-- RecyclerView с wrap_content -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerNoGps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <!-- Кнопка сразу после списка -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddTaskNoLocation"
                     android:layout_width="match_parent"
+                    android:layout_height="64dp"
                     android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="4dp"
+                    android:layout_marginTop="12dp"
                     style="@style/AppButton.Add" />
 
             </LinearLayout>

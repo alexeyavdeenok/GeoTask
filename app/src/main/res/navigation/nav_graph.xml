@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_taskListFragment_to_taskCreateFragment"
             app:destination="@id/taskCreateFragment" />
+        <action
+            android:id="@+id/action_taskListFragment_to_taskDetailFragment"
+            app:destination="@id/taskDetailFragment"/>
     </fragment>
 
     <fragment
@@ -34,6 +37,9 @@
         <action
             android:id="@+id/action_locationListFragment_to_locationCreateFragment"
             app:destination="@id/locationCreateFragment"/>
+        <action
+            android:id="@+id/action_locationListFragment_to_locationDetailFragment"
+            app:destination="@id/locationDetailFragment"/>
     </fragment>   <!-- или map_place, если другой -->
 
     <fragment
@@ -94,6 +100,12 @@
         android:id="@+id/locationDetailFragment"
         android:name="com.geotask.presentation.ui.locations.LocationDetailFragment"
         android:label="О локации">
+
+        <action
+            android:id="@+id/action_locationDetailFragment_to_locationListFragment"
+            app:destination="@id/taskListFragment"
+            app:popUpTo="@id/locationDetailFragment"
+            app:popUpToInclusive="false"/>
 
     </fragment>
 

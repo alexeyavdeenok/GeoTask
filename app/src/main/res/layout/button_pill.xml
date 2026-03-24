@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="GPS"
+            android:text="Список"
             android:textSize="14sp"
             android:background="@drawable/bg_segment_selected"
             android:textColor="#000000"/>
@@ -39,7 +39,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Manual"
+            android:text="Карта"
             android:textSize="14sp"
             android:textColor="#000000"/>
     </LinearLayout>
