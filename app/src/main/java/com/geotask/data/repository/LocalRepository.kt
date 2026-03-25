@@ -1,8 +1,9 @@
 package com.geotask.data.repository
 
 import androidx.lifecycle.LiveData
-import com.geotask.data.local.TaskDao
+import com.geotask.data.local.dao.TaskDao
 import com.geotask.domain.model.Task
+import com.geotask.domain.repository.TaskRepository
 import javax.inject.Inject
 
 class LocalTaskRepository @Inject constructor(

@@ -1,4 +1,4 @@
-package com.geotask.data.local
+package com.geotask.data.local.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -11,7 +11,10 @@ import com.geotask.domain.model.Task
 @Dao
 interface TaskDao {
     @Query("SELECT * FROM tasks") fun getAllTasks(): LiveData<List<Task>>
-    @Insert suspend fun insert(task: Task)
-    @Update suspend fun update(task: Task)
-    @Delete suspend fun delete(task: Task)
+    @Insert
+    suspend fun insert(task: Task)
+    @Update
+    suspend fun update(task: Task)
+    @Delete
+    suspend fun delete(task: Task)
 }

@@ -1,4 +1,4 @@
-package com.geotask.data.repository
+package com.geotask.domain.repository
 
 import androidx.lifecycle.LiveData
 import com.geotask.domain.model.Task
