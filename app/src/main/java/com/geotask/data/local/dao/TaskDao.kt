@@ -11,6 +11,9 @@ import com.geotask.domain.model.Task
 @Dao
 interface TaskDao {
     @Query("SELECT * FROM tasks") fun getAllTasks(): LiveData<List<Task>>
+
+    @Query("SELECT * FROM tasks WHERE locationId = :locationId")
+    fun getTasksByLocationSync(locationId: Long): List<Task>
     @Insert
     suspend fun insert(task: Task)
     @Update
