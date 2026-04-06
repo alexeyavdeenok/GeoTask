@@ -2,8 +2,7 @@ package com.geotask.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.geotask.domain.model.Task
-import com.geotask.domain.repository.TaskRepository
+import com.geotask.domain.usecase.task.CreateTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,22 +12,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val createTaskUseCase: CreateTaskUseCase
 ) : ViewModel() {
 
     private val _selectedLocationId = MutableStateFlow<Long?>(null)
     val selectedLocationId: StateFlow<Long?> = _selectedLocationId.asStateFlow()
 
-    fun createTask(title: String, deadline: Long? = null, description: String? = null) {
+    fun createTask(
+        title: String,
+        deadline: Long? = null,
+        description: String? = null
+    ) {
         viewModelScope.launch {
-            val task = Task.Builder(title)
-                .locationId(selectedLocationId.value)
-                .deadline(deadline)
-                .description(description)
-                .build()
-
-            taskRepository.insertTask(task)
-            // Здесь можно просто ничего не возвращать, а обработку успеха делать в Fragment
+            createTaskUseCase(
+                title = title,
+                description = description,
+                locationId = selectedLocationId.value,
+                deadline = deadline
+            )
         }
     }
 
