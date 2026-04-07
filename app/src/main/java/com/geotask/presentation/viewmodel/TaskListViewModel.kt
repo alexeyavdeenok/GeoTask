@@ -12,5 +12,5 @@ class TaskListViewModel @Inject constructor(
     private val repository: TaskRepository
 ) : ViewModel() {
 
-    val tasks: LiveData<List<Task>> = repository.getAllTasks()
+    val tasks: LiveData<List<Task>> = repository.getAllActiveTasks()
 }

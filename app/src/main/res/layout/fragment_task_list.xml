@@ -33,15 +33,6 @@
                 android:paddingTop="8dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTask"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginVertical="4dp"
-                    android:text="Вынести мусор"
-                    style="@style/AppButton.Main" />
-
-                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddTaskLocation"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"

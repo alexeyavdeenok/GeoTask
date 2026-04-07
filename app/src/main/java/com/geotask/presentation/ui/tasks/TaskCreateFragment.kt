@@ -20,10 +20,15 @@ class TaskCreateFragment : Fragment(R.layout.add_task) {
         val etTitle = view.findViewById<EditText>(R.id.etTitle)
         val etDesc = view.findViewById<EditText>(R.id.etDesc)
 
+
+        view.findViewById<View>(R.id.btnTaskCancel)?.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         view.findViewById<View>(R.id.btnTaskSave)?.setOnClickListener {
 
-            val title = etTitle.text.toString()
-            val desc = etDesc.text.toString()
+            val title = etTitle.text.toString().trim()
+            val desc = etDesc.text.toString().trim()
 
             if (title.isBlank()) return@setOnClickListener
 

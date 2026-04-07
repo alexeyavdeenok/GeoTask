@@ -9,4 +9,7 @@ interface TaskRepository {
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
     fun getTasksByLocationSync(locationId: Long): List<Task>
+    fun getTaskById(id: Long): LiveData<Task?>
+
+    fun getAllActiveTasks(): LiveData<List<Task>>
 }

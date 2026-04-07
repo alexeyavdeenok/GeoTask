@@ -82,6 +82,10 @@
             app:destination="@id/taskListFragment"
             app:popUpTo="@id/taskListFragment"
             app:popUpToInclusive="false" />
+        <argument
+            android:name="taskId"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
 
     <fragment

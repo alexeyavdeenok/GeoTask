@@ -14,6 +14,12 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE locationId = :locationId")
     fun getTasksByLocationSync(locationId: Long): List<Task>
+
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    fun getTaskById(id: Long): LiveData<Task?>
+
+    @Query("SELECT * FROM tasks WHERE status = 'ACTIVE'")  // если createdAt нет — убери
+    fun getAllActiveTasks(): LiveData<List<Task>>
     @Insert
     suspend fun insert(task: Task)
     @Update
