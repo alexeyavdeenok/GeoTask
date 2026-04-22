@@ -54,4 +54,15 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.navigation:navigation-ui:2.7.7")
     implementation("androidx.navigation:navigation-dynamic-features-fragment:2.8.0")
+
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    // --- Сеть (Только для Погоды) ---
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // --- Изображения (Если захочешь иконки погоды) ---
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("androidx.preference:preference:1.2.1")
 }

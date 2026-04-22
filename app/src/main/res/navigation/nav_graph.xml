@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_locationListFragment_to_locationDetailFragment"
             app:destination="@id/locationDetailFragment"/>
+        <action
+            android:id="@+id/action_locationListFragment_to_mapPlacesFragment"
+            app:destination="@id/mapPlacesFragment"/>
     </fragment>   <!-- или map_place, если другой -->
 
     <fragment
@@ -50,9 +53,13 @@
 
     <fragment
         android:id="@+id/mapPlacesFragment"
-        android:name="com.geotask.presentation.ui.locations.MapPlacesFragment"
+        android:name="com.geotask.presentation.ui.map.MapPlacesFragment"
         android:label="локации на карте">
-
+        <action
+            android:id="@+id/action_mapPlacesFragment_to_locationListFragment"
+            app:destination="@id/locationListFragment"
+            app:popUpTo="@id/locationListFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- ==================== ЭКРАНЫ БЕЗ НИЖНЕЙ ПАНЕЛИ (открываются поверх) ==================== -->
