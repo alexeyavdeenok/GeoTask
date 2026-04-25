@@ -1,9 +1,17 @@
 package com.geotask.presentation.ui.map
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -26,10 +34,36 @@ class MapPlacesFragment : Fragment(R.layout.map_place) {
     private val viewModel: MapPlacesViewModel by viewModels()
     private lateinit var mapView: MapView
     private val markers = mutableMapOf<Marker, Location>()
+    private var userLocationMarker: Marker? = null
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        when {
+            fineLocationGranted || coarseLocationGranted -> {
+                Log.d("MapPlacesFragment", "Location permission granted")
+                viewModel.loadUserLocation()
+            }
+            !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                Log.d("MapPlacesFragment", "Location permission denied - show settings dialog")
+                showPermissionDeniedDialog()
+            }
+            else -> {
+                Log.d("MapPlacesFragment", "Location permission denied - but can ask again")
+                Toast.makeText(requireContext(), "Разрешение на доступ к геолокации отказано", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("MapPlacesFragment", "onViewCreated called")
+
+        // Проверка и запрос разрешений на геолокацию
+        checkAndRequestLocationPermission()
 
         // Устанавливаем правильное состояние кнопок (Карта выбрана)
         val btnLeft = view.findViewById<TextView>(R.id.btnLeft)
@@ -59,7 +93,7 @@ class MapPlacesFragment : Fragment(R.layout.map_place) {
 
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(15.0)
-        val center = GeoPoint(55.7558, 37.6173)
+        val center = GeoPoint(56.0104, 92.8526)
         mapView.controller.setCenter(center)
         Log.d("MapPlacesFragment", "Map centered at $center with zoom 15")
 
@@ -71,10 +105,24 @@ class MapPlacesFragment : Fragment(R.layout.map_place) {
             }
         }
 
+        // Подписка на местоположение пользователя
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.userLocation.collectLatest { geoPoint ->
+                if (geoPoint != null) {
+                    Log.d("MapPlacesFragment", "User location updated: $geoPoint")
+                    val osmGeoPoint = GeoPoint(geoPoint.latitude, geoPoint.longitude)
+                    updateUserLocationMarker(osmGeoPoint)
+                } else {
+                    Log.d("MapPlacesFragment", "User location is null")
+                    clearUserLocationMarker()
+                }
+            }
+        }
+
         // Кнопка "Мое местоположение"
         view.findViewById<View>(R.id.fab_my_location)?.setOnClickListener {
             Log.d("MapPlacesFragment", "My location button clicked")
-            // TODO: Реализовать получение текущего местоположения
+            handleMyLocationClick()
         }
 
         // Возврат к списку при нажатии на "Список" кнопку
@@ -113,6 +161,110 @@ class MapPlacesFragment : Fragment(R.layout.map_place) {
         // Передача выбранного места обратно
         findNavController().previousBackStackEntry?.savedStateHandle?.set("selected_location", location)
         findNavController().popBackStack()
+    }
+
+    private fun checkAndRequestLocationPermission() {
+        val fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
+        val coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
+
+        val fineGranted = ContextCompat.checkSelfPermission(requireContext(), fineLocationPermission) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ContextCompat.checkSelfPermission(requireContext(), coarseLocationPermission) == PackageManager.PERMISSION_GRANTED
+
+        when {
+            fineGranted || coarseGranted -> {
+                Log.d("MapPlacesFragment", "Location permissions already granted")
+                viewModel.loadUserLocation()
+            }
+            shouldShowRequestPermissionRationale(fineLocationPermission) -> {
+                Log.d("MapPlacesFragment", "Showing permission rationale dialog")
+                showPermissionRationaleDialog()
+            }
+            else -> {
+                Log.d("MapPlacesFragment", "Requesting location permissions")
+                requestPermissionLauncher.launch(arrayOf(fineLocationPermission, coarseLocationPermission))
+            }
+        }
+    }
+
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Доступ к геолокации")
+            .setMessage("Приложению требуется доступ к вашему местоположению для отображения вас на карте.")
+            .setPositiveButton("Разрешить") { _, _ ->
+                requestPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Разрешение отказано")
+            .setMessage("Для отображения вашего местоположения на карте, пожалуйста, разрешите доступ к геолокации в настройках приложения.")
+            .setPositiveButton("Открыть настройки") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = android.net.Uri.fromParts("package", requireContext().packageName, null)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun handleMyLocationClick() {
+        val userGeoPoint = viewModel.centerOnUserLocation()
+        when {
+            userGeoPoint != null -> {
+                Log.d("MapPlacesFragment", "Centering map on user location: $userGeoPoint")
+                val osmGeoPoint = GeoPoint(userGeoPoint.latitude, userGeoPoint.longitude)
+                mapView.controller.animateTo(osmGeoPoint)
+                mapView.controller.setZoom(16.0)
+            }
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED -> {
+                Log.d("MapPlacesFragment", "Permissions not granted, requesting")
+                checkAndRequestLocationPermission()
+            }
+            else -> {
+                Log.d("MapPlacesFragment", "Location not available yet")
+                Toast.makeText(requireContext(), "Не удалось определить ваше местоположение", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateUserLocationMarker(geoPoint: GeoPoint) {
+        // Удалим старый маркер если есть
+        clearUserLocationMarker()
+
+        // Создаем новый маркер пользователя
+        userLocationMarker = Marker(mapView).apply {
+            position = geoPoint
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            title = "Мое местоположение"
+            // Используем синий цвет для отличия от обычных маркеров
+            infoWindow = null
+        }
+
+        // Добавляем маркер на карту
+        mapView.overlays.add(userLocationMarker)
+        mapView.invalidate()
+        Log.d("MapPlacesFragment", "User location marker added at $geoPoint")
+    }
+
+    private fun clearUserLocationMarker() {
+        userLocationMarker?.let {
+            mapView.overlays.remove(it)
+            userLocationMarker = null
+            mapView.invalidate()
+            Log.d("MapPlacesFragment", "User location marker removed")
+        }
     }
 
     override fun onResume() {

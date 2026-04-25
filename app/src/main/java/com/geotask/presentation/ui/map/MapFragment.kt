@@ -56,8 +56,8 @@ class MapFragment : Fragment(R.layout.choose_place) {
             val currentLocation = (requireActivity() as? android.app.Activity)?.let {
                 // Попытаемся получить текущее местоположение
                 // На данный момент используем Москву как центр по умолчанию
-                GeoPoint(55.7558, 37.6173)
-            } ?: GeoPoint(55.7558, 37.6173)
+                GeoPoint(56.0104, 92.8526)
+            } ?: GeoPoint(56.0104, 92.8526)
             
             mapView.controller.setCenter(currentLocation)
             Log.d("MapFragment", "Map centered at $currentLocation with zoom 15")
