@@ -105,6 +105,10 @@
             app:destination="@+id/locationListFragment"
             app:popUpTo="@id/locationCreateFragment"
             app:popUpToInclusive="false"/>
+        
+        <action
+            android:id="@+id/action_locationCreateFragment_to_mapFragment"
+            app:destination="@id/mapFragment"/>
     </fragment>
 
     <fragment

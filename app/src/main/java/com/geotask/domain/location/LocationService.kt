@@ -1,12 +1,12 @@
 package com.geotask.domain.location
 
-import com.geotask.domain.model.Location
+import com.geotask.domain.model.GeoPoint
 
 class LocationService(
     private val locationProvider: LocationProvider
 ) {
-
-    fun getCurrentLocation(): Location? {
+    // Здесь тоже должен быть suspend
+    suspend fun getCurrentLocation(): GeoPoint? {
         return locationProvider.getCurrentLocation()
     }
 }

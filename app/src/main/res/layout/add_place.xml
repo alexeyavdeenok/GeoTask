@@ -14,6 +14,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to select location from map -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSelectLocation"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Выбрать местоположение"
+        style="@style/AppButton.ChoosePlace"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Title -->
     <EditText
         android:id="@+id/etTitle"
@@ -29,21 +42,42 @@
         android:textSize="16sp"
         android:inputType="text"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/btnChoose"
+        app:layout_constraintTop_toBottomOf="@id/btnSelectLocation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Description -->
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnChoose"
+    <EditText
+        android:id="@+id/etDescription"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="120dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        style="@style/AppButton.ChoosePlace"
-        app:layout_constraintTop_toBottomOf="@id/header"
+        android:background="@drawable/bg_input_frame"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:hint="Описание местоположения"
+        android:textColor="#1C1B1F"
+        android:textSize="16sp"
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        app:layout_constraintTop_toBottomOf="@id/etTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Selected location info -->
+    <TextView
+        android:id="@+id/tvLocationInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:textColor="#666666"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/etDescription"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

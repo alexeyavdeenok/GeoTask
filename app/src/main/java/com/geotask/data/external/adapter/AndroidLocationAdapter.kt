@@ -1,22 +1,24 @@
 package com.geotask.data.external.adapter
 
-import android.location.Location as AndroidLocation
+import android.annotation.SuppressLint
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.geotask.domain.location.LocationProvider
-import com.geotask.domain.model.Location
+import com.geotask.domain.model.GeoPoint
+import kotlinx.coroutines.suspendCancellableCoroutine
+import javax.inject.Inject
+import kotlin.coroutines.resume
 
-class AndroidLocationAdapter : LocationProvider {
+class AndroidLocationAdapter @Inject constructor(
+    private val fusedClient: FusedLocationProviderClient
+) : LocationProvider {
 
-    override fun getCurrentLocation(): Location? {
-        // TODO: реализовать получение локации через Android API
-        return null
-    }
-
-    fun toDomain(androidLocation: AndroidLocation): Location {
-        return Location(
-            id = -1L,
-            name = "Current Location",
-            latitude = androidLocation.latitude,
-            longitude = androidLocation.longitude
-        )
+    @SuppressLint("MissingPermission")
+    override suspend fun getCurrentLocation(): GeoPoint? = suspendCancellableCoroutine { cont ->
+        fusedClient.lastLocation.addOnSuccessListener { location ->
+            val point = location?.let { GeoPoint(it.latitude, it.longitude) }
+            cont.resume(point)
+        }.addOnFailureListener {
+            cont.resume(null)
+        }
     }
 }

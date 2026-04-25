@@ -1,8 +1,8 @@
 // com.geotask.domain.location/LocationProvider.kt
 package com.geotask.domain.location
 
-import com.geotask.domain.model.Location
+import com.geotask.domain.model.GeoPoint
 
 interface LocationProvider {
-    fun getCurrentLocation(): Location?
+    suspend fun getCurrentLocation(): GeoPoint?
 }

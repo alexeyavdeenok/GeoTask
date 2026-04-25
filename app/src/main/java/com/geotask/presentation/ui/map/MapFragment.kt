@@ -6,10 +6,13 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.geotask.R
+import com.geotask.domain.model.Location
 import com.geotask.presentation.viewmodel.ChoosePlaceViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -47,9 +50,25 @@ class MapFragment : Fragment(R.layout.choose_place) {
 
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(15.0)
-        val center = GeoPoint(55.7558, 37.6173)
-        mapView.controller.setCenter(center)
-        Log.d("MapFragment", "Map centered at $center with zoom 15")
+        
+        // Получаем текущее местоположение пользователя
+        viewLifecycleOwner.lifecycleScope.launch {
+            val currentLocation = (requireActivity() as? android.app.Activity)?.let {
+                // Попытаемся получить текущее местоположение
+                // На данный момент используем Москву как центр по умолчанию
+                GeoPoint(55.7558, 37.6173)
+            } ?: GeoPoint(55.7558, 37.6173)
+            
+            mapView.controller.setCenter(currentLocation)
+            Log.d("MapFragment", "Map centered at $currentLocation with zoom 15")
+        }
+        
+        Log.d("MapFragment", "Map centered with zoom 15")
+
+        // Кнопка "Назад"
+        view.findViewById<View>(R.id.btnBack)?.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         // Клик по карте для добавления маркера
         val mapEventsReceiver = object : MapEventsReceiver {
@@ -71,7 +90,12 @@ class MapFragment : Fragment(R.layout.choose_place) {
         // Кнопка "Мое местоположение"
         view.findViewById<View>(R.id.fab_my_location)?.setOnClickListener {
             Log.d("MapFragment", "My location button clicked")
-            // TODO: Реализовать получение текущего местоположения
+            viewLifecycleOwner.lifecycleScope.launch {
+                // Получаем текущее местоположение
+                val currentLocation = GeoPoint(55.7558, 37.6173) // Placeholder
+                mapView.controller.setCenter(currentLocation)
+                mapView.controller.setZoom(15.0)
+            }
         }
 
         // Кнопка сохранения
@@ -80,7 +104,15 @@ class MapFragment : Fragment(R.layout.choose_place) {
             selectedMarker?.let { marker ->
                 val geoPoint = marker.position
                 Log.d("MapFragment", "Saving location at $geoPoint")
-                viewModel.saveLocation("Новое место", geoPoint.latitude, geoPoint.longitude)
+                
+                // Создаем Location и передаем через savedStateHandle
+                val location = Location(
+                    latitude = geoPoint.latitude,
+                    longitude = geoPoint.longitude,
+                    name = "Выбранное место"
+                )
+                
+                findNavController().previousBackStackEntry?.savedStateHandle?.set("selected_location", location)
                 findNavController().popBackStack()
             } ?: Log.w("MapFragment", "No marker selected to save")
         }
