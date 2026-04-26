@@ -20,6 +20,14 @@
         <action
             android:id="@+id/action_taskListFragment_to_taskDetailFragment"
             app:destination="@id/taskDetailFragment"/>
+        <action
+            android:id="@+id/action_taskListFragment_to_taskCreateFragment_withLocation"
+            app:destination="@id/taskCreateFragment">
+            <argument
+                android:name="locationId"
+                app:argType="long"
+                android:defaultValue="-1L" />
+        </action>
     </fragment>
 
     <fragment
@@ -69,6 +77,10 @@
         android:name="com.geotask.presentation.ui.tasks.TaskCreateFragment"
         android:label="Новая задача"
         tools:layout="@layout/add_task">
+        <argument
+            android:name="locationId"
+            app:argType="long"
+            android:defaultValue="-1L" />
 
         <!-- Возврат назад на список задач -->
         <action
