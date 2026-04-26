@@ -9,21 +9,14 @@ data class Weather(
     val cityName: String = ""
 )
 
-fun mapOpenWeatherIcon(iconCode: String, description: String): Weather {
-    val iconRes = when (iconCode) {
-        "01d", "01n" -> R.drawable.ic_sunny
-        "02d", "02n" -> R.drawable.ic_sunny      // замени на ic_cloudy когда будет
-        "03d", "03n", "04d", "04n" -> R.drawable.ic_cloudy // замени на ic_cloudy
-        "09d", "09n", "10d", "10n" -> R.drawable.ic_rainy// замени на ic_rain
-        "11d", "11n" -> R.drawable.ic_sunny      // замени на ic_thunder
-        "13d", "13n" -> R.drawable.ic_sunny      // замени на ic_snow
-        "50d", "50n" -> R.drawable.ic_sunny      // замени на ic_fog
-        else -> R.drawable.ic_sunny
+fun mapWeatherCode(code: Int): Weather {
+    return when (code) {
+        0 -> Weather(0, "Ясно", R.drawable.ic_sunny)
+        1, 2, 3 -> Weather(0, "Облачно", R.drawable.ic_sunny) // замени на ic_cloudy
+        45, 48 -> Weather(0, "Туман", R.drawable.ic_sunny)    // замени на ic_fog
+        51, 53, 55, 61, 63, 65 -> Weather(0, "Дождь", R.drawable.ic_sunny) // ic_rain
+        71, 73, 75 -> Weather(0, "Снег", R.drawable.ic_sunny) // ic_snow
+        95, 96, 99 -> Weather(0, "Гроза", R.drawable.ic_sunny) // ic_thunder
+        else -> Weather(0, "Ясно", R.drawable.ic_sunny)
     }
-
-    return Weather(
-        temperature = 0,
-        description = description.replaceFirstChar { it.uppercase() },
-        iconRes = iconRes
-    )
 }
