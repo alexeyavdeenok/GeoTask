@@ -128,6 +128,11 @@
         android:name="com.geotask.presentation.ui.locations.LocationDetailFragment"
         android:label="О локации">
 
+        <argument
+            android:name="locationId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+
         <action
             android:id="@+id/action_locationDetailFragment_to_locationListFragment"
             app:destination="@id/taskListFragment"

@@ -56,9 +56,15 @@ class LocationListFragment : Fragment(R.layout.places) {
                         button.text = location.name ?: "Без названия"
 
                         button.setOnClickListener {
-                            // Переход на карту (можно расширить до деталей позже)
+                            // Создаем бандл с ID локации
+                            val bundle = Bundle().apply {
+                                putLong("locationId", location.id)
+                            }
+
+                            // Переходим на экран деталей вместо карты
                             findNavController().navigate(
-                                R.id.action_locationListFragment_to_mapPlacesFragment
+                                R.id.action_locationListFragment_to_locationDetailFragment,
+                                bundle
                             )
                         }
 

@@ -22,22 +22,35 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
 
     private val viewModel: TaskListViewModel by viewModels()
 
+    // Кэшируем ссылки на статические кнопки добавления,
+    // чтобы они не терялись при вызове removeAllViews()
+    private var btnAddNoLocation: View? = null
+    private var btnAddWithLocation: MaterialButton? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Инициализация контейнеров
         val containerNoGps = view.findViewById<LinearLayout>(R.id.containerTasksNoGps)
         val containerWithGps = view.findViewById<LinearLayout>(R.id.containerTasksWithGps)
-        val btnAddTaskLocation = view.findViewById<MaterialButton>(R.id.btnAddTaskLocation)
+
+        // Инициализация кнопок (находим их один раз)
+        btnAddNoLocation = view.findViewById(R.id.btnAddTaskNoLocation)
+        btnAddWithLocation = view.findViewById(R.id.btnAddTaskLocation)
         val btnWeatherLocation = view.findViewById<MaterialButton>(R.id.btnWeatherLocation)
 
+        // Инициализация элементов погоды
         val tvTemp = view.findViewById<TextView>(R.id.tvWeatherTemp)
         val ivIcon = view.findViewById<ImageView>(R.id.ivWeatherIcon)
         val tvDesc = view.findViewById<TextView>(R.id.tvWeatherDesc)
         val tvCity = view.findViewById<TextView>(R.id.tvWeatherCity)
 
+        // Запуск загрузки данных
         viewModel.loadWeatherAndCheckLocation()
 
-        // Погода
+        // --- Наблюдатели (Observers) ---
+
+        // Обновление погоды
         viewModel.weather.observe(viewLifecycleOwner) { weather ->
             weather?.let {
                 val sign = if (it.temperature > 0) "+" else ""
@@ -48,98 +61,92 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
             }
         }
 
-        // Главный наблюдатель за задачами
-        viewModel.tasks.observe(viewLifecycleOwner) { allTasks ->
-            val activeLocation = viewModel.activeLocation.value
-
-            updateNoLocationContainer(containerNoGps, allTasks)
-
-            if (activeLocation != null) {
-                updateWithLocationContainer(containerWithGps, btnAddTaskLocation, allTasks, activeLocation)
-                containerWithGps?.isVisible = true
-                btnAddTaskLocation?.isVisible = true
-            } else {
-                containerWithGps?.isVisible = false
-                btnAddTaskLocation?.isVisible = false
-            }
-        }
-
-        // Активная локация (заголовок)
+        // Обновление состояния локации (геозоны)
         viewModel.activeLocation.observe(viewLifecycleOwner) { activeLocation ->
             if (activeLocation != null) {
                 btnWeatherLocation?.text = activeLocation.name
                 btnWeatherLocation?.setIconResource(R.drawable.ic_location)
+
+                // Показываем блок для GPS-задач
+                containerWithGps?.isVisible = true
+                btnAddWithLocation?.isVisible = true
             } else {
                 btnWeatherLocation?.text = viewModel.weather.value?.cityName ?: "Неизвестно"
                 btnWeatherLocation?.setIconResource(R.drawable.ic_location_off)
+
+                // Скрываем блок для GPS-задач, если мы не в зоне
+                containerWithGps?.isVisible = false
+                btnAddWithLocation?.isVisible = false
             }
+            // Перерисовываем списки при изменении локации
+            viewModel.tasks.value?.let { updateTaskLists(containerNoGps, containerWithGps, it) }
         }
 
-        // Кнопки добавления
-        btnAddTaskLocation?.setOnClickListener {
+        // Основной наблюдатель за списком задач
+        viewModel.tasks.observe(viewLifecycleOwner) { allTasks ->
+            updateTaskLists(containerNoGps, containerWithGps, allTasks)
+        }
+
+        // --- Обработка кликов ---
+
+        btnAddNoLocation?.setOnClickListener {
+            findNavController().navigate(
+                TaskListFragmentDirections.actionTaskListFragmentToTaskCreateFragment()
+            )
+        }
+
+        btnAddWithLocation?.setOnClickListener {
             val locationId = viewModel.activeLocation.value?.id ?: -1L
             findNavController().navigate(
                 TaskListFragmentDirections.actionTaskListFragmentToTaskCreateFragmentWithLocation(locationId)
             )
         }
-
-        view.findViewById<View>(R.id.btnAddTaskNoLocation)?.setOnClickListener {
-            findNavController().navigate(
-                TaskListFragmentDirections.actionTaskListFragmentToTaskCreateFragment()
-            )
-        }
     }
 
-    private fun updateNoLocationContainer(container: LinearLayout?, allTasks: List<Task>) {
-        container?.removeAllViews() ?: return
-
-        val tasks = allTasks.filter { it.locationId == null }
-
-        // Добавляем задачи без локации
-        tasks.forEach { task ->
-            val button = layoutInflater.inflate(R.layout.item_task_button, container, false) as MaterialButton
-            button.text = task.title
-            button.setOnClickListener {
-                findNavController().navigate(
-                    TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment(task.id)
-                )
-            }
-            container.addView(button)
-        }
-
-        // === ВАЖНО: Добавляем кнопку "Добавить без локации" в конец ===
-        val addButton = view?.findViewById<View>(R.id.btnAddTaskNoLocation)
-        if (addButton != null) {
-            // Убираем кнопку из предыдущего родителя, если она где-то висит
-            (addButton.parent as? ViewGroup)?.removeView(addButton)
-            container.addView(addButton)
-        }
-    }
-    private fun updateWithLocationContainer(
-        container: LinearLayout?,
-        addButton: MaterialButton?,
-        allTasks: List<Task>,
-        activeLocation: Location
+    /**
+     * Общий метод для обновления обоих контейнеров
+     */
+    private fun updateTaskLists(
+        containerNoGps: LinearLayout?,
+        containerWithGps: LinearLayout?,
+        allTasks: List<Task>
     ) {
+        val activeLocation = viewModel.activeLocation.value
+
+        // 1. Задачи без локации
+        val tasksNoGps = allTasks.filter { it.locationId == null }
+        renderTaskButtons(containerNoGps, tasksNoGps, btnAddNoLocation)
+
+        // 2. Задачи для текущей активной локации
+        if (activeLocation != null) {
+            val tasksWithGps = allTasks.filter { it.locationId == activeLocation.id }
+            renderTaskButtons(containerWithGps, tasksWithGps, btnAddWithLocation)
+        }
+    }
+
+    /**
+     * Универсальный метод отрисовки кнопок внутри контейнера
+     */
+    private fun renderTaskButtons(container: LinearLayout?, tasks: List<Task>, addButton: View?) {
         container?.removeAllViews() ?: return
 
-        val tasks = allTasks.filter { it.locationId == activeLocation.id }
-
+        // Добавляем кнопки самих задач
         tasks.forEach { task ->
-            val button = layoutInflater.inflate(R.layout.item_task_button, container, false) as MaterialButton
-            button.text = task.title
-            button.setOnClickListener {
+            val taskItem = layoutInflater.inflate(R.layout.item_task_button, container, false) as MaterialButton
+            taskItem.text = task.title
+            taskItem.setOnClickListener {
                 findNavController().navigate(
                     TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment(task.id)
                 )
             }
-            container.addView(button)
+            container.addView(taskItem)
         }
 
-        // Добавляем кнопку "Добавить задачу с локацией" в конец
-        if (addButton != null) {
-            (addButton.parent as? ViewGroup)?.removeView(addButton)
-            container.addView(addButton)
+        // Возвращаем кнопку "Добавить" в конец списка
+        addButton?.let { button ->
+            // Важно: отсоединяем кнопку от текущего родителя перед добавлением в новый
+            (button.parent as? ViewGroup)?.removeView(button)
+            container.addView(button)
         }
     }
 }

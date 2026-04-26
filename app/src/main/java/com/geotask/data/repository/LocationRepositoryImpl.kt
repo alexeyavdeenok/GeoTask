@@ -9,19 +9,13 @@ import javax.inject.Inject
 class LocationRepositoryImpl @Inject constructor(
     private val locationDao: LocationDao
 ) : LocationRepository {
+    override suspend fun insert(location: Location): Long = locationDao.insert(location)
 
-    override suspend fun insert(location: Location): Long =
-        locationDao.insert(location)
+    override suspend fun update(location: Location) = locationDao.update(location)
 
-    override suspend fun getById(id: Long): Location? =
-        locationDao.getById(id)
+    override fun getById(id: Long): Flow<Location?> = locationDao.getById(id)
 
-    override fun getAll(): Flow<List<Location>> =
-        locationDao.getAll()
+    override fun getAll(): Flow<List<Location>> = locationDao.getAll()
 
-    override suspend fun getAllSync(): List<Location> =
-        locationDao.getAllSync()
-
-    override suspend fun deleteById(id: Long) =
-        locationDao.deleteById(id)
+    override suspend fun deleteById(id: Long) = locationDao.deleteById(id)
 }
