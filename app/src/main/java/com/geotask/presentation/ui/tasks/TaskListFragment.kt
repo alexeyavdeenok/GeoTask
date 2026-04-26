@@ -2,7 +2,10 @@ package com.geotask.presentation.ui.tasks
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -20,9 +23,53 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
         super.onViewCreated(view, savedInstanceState)
 
         val containerNoGps = view.findViewById<LinearLayout>(R.id.containerTasksNoGps)
+        val containerWithGps = view.findViewById<LinearLayout>(R.id.containerTasksWithGps)
+        val btnAddTaskLocation = view.findViewById<MaterialButton>(R.id.btnAddTaskLocation)
+        val btnWeatherLocation = view.findViewById<MaterialButton>(R.id.btnWeatherLocation)
+
+        // === ПОГОДА + ГЕОЗОНА ===
+        viewModel.loadWeatherAndCheckLocation()
+
+        val tvTemp = view.findViewById<TextView>(R.id.tvWeatherTemp)
+        val ivIcon = view.findViewById<ImageView>(R.id.ivWeatherIcon)
+        val tvDesc = view.findViewById<TextView>(R.id.tvWeatherDesc)
+        val tvCity = view.findViewById<TextView>(R.id.tvWeatherCity)
+
+        viewModel.weather.observe(viewLifecycleOwner) { weather ->
+            if (weather != null && tvTemp != null && ivIcon != null) {
+                val sign = if (weather.temperature > 0) "+" else ""
+                tvTemp.text = "$sign${weather.temperature}°"
+                ivIcon.setImageResource(weather.iconRes)
+                tvDesc?.text = weather.description
+                tvCity?.text = weather.cityName
+            }
+        }
+
+        // === АКТИВНАЯ ЛОКАЦИЯ / ГЕОЗОНА ===
+        viewModel.activeLocation.observe(viewLifecycleOwner) { location ->
+            if (location != null) {
+                // Пользователь ВНУТРИ геозоны
+                btnWeatherLocation?.text = location.name
+                btnWeatherLocation?.setIconResource(R.drawable.ic_location) // или другая иконка
+
+                // Показываем контейнер с GPS-задачами и кнопку добавления
+                containerWithGps?.isVisible = true
+                btnAddTaskLocation?.isVisible = true
+
+                // TODO: здесь потом фильтровать задачи по location.id
+            } else {
+                // Пользователь ВНЕ геозон
+                btnWeatherLocation?.text = viewModel.weather.value?.cityName ?: "Неизвестно"
+                btnWeatherLocation?.setIconResource(R.drawable.ic_location_off) // или ic_location
+
+                // Скрываем контейнер с GPS-задачами и кнопку добавления с локацией
+                containerWithGps?.isVisible = false
+                btnAddTaskLocation?.isVisible = false
+            }
+        }
 
         // === Кнопки добавления задач ===
-        view.findViewById<View>(R.id.btnAddTaskLocation).setOnClickListener {
+        btnAddTaskLocation?.setOnClickListener {
             findNavController().navigate(
                 TaskListFragmentDirections.actionTaskListFragmentToTaskCreateFragment()
             )
@@ -37,14 +84,10 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
         // === Отображение задач без геопозиции ===
         viewModel.tasks.observe(viewLifecycleOwner) { allTasks ->
             val tasksNoGps = allTasks.filter { it.locationId == null }
-
-            // Удаляем только задачи, но оставляем кнопку добавления
-            // Для этого сначала удаляем все View, кроме кнопки добавления
             val addButton = view.findViewById<View>(R.id.btnAddTaskNoLocation)
 
             containerNoGps.removeAllViews()
 
-            // 1. Добавляем все задачи без геопозиции
             tasksNoGps.forEach { task ->
                 val taskButton = layoutInflater.inflate(
                     R.layout.item_task_button,
@@ -53,7 +96,6 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
                 ) as MaterialButton
 
                 taskButton.text = task.title
-
                 taskButton.setOnClickListener {
                     val action = TaskListFragmentDirections
                         .actionTaskListFragmentToTaskDetailFragment(task.id)
@@ -63,7 +105,6 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
                 containerNoGps.addView(taskButton)
             }
 
-            // 2. Добавляем кнопку "Добавить задачу без локации" в самый конец
             if (addButton.parent == null) {
                 containerNoGps.addView(addButton)
             }
