@@ -5,9 +5,13 @@ import com.geotask.data.local.AppDatabase
 import com.geotask.data.local.dao.LocationDao
 import com.geotask.data.local.dao.SettingsDao
 import com.geotask.data.local.dao.TaskDao
+import com.geotask.data.local.dao.SecureLocationDao
+import com.geotask.data.local.dao.SecureSettingsDao
+import com.geotask.data.local.dao.SecureTaskDao
 import com.geotask.data.repository.LocationRepositoryImpl
 import com.geotask.data.repository.SettingsRepositoryImpl
 import com.geotask.data.repository.LocalTaskRepository
+import com.geotask.data.security.EncryptionManager
 import com.geotask.domain.repository.LocationRepository
 import com.geotask.domain.repository.SettingsRepository
 import com.geotask.domain.repository.TaskRepository
@@ -28,15 +32,33 @@ object AppModule {
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         AppDatabase.getDatabase(context)
 
-    // ==================== DAOs ====================
+    // ==================== Encryption ====================
     @Provides
-    fun provideTaskDao(db: AppDatabase): TaskDao = db.taskDao()
+    @Singleton
+    fun provideEncryptionManager(): EncryptionManager =
+        EncryptionManager()
+
+    // ==================== DAOs (with Security Layer) ====================
+    @Provides
+    @Singleton
+    fun provideTaskDao(
+        db: AppDatabase,
+        encryptionManager: EncryptionManager
+    ): TaskDao = SecureTaskDao(db.taskDao(), encryptionManager)
 
     @Provides
-    fun provideLocationDao(db: AppDatabase): LocationDao = db.locationDao()
+    @Singleton
+    fun provideLocationDao(
+        db: AppDatabase,
+        encryptionManager: EncryptionManager
+    ): LocationDao = SecureLocationDao(db.locationDao(), encryptionManager)
 
     @Provides
-    fun provideSettingsDao(db: AppDatabase): SettingsDao = db.settingsDao()
+    @Singleton
+    fun provideSettingsDao(
+        db: AppDatabase,
+        encryptionManager: EncryptionManager
+    ): SettingsDao = SecureSettingsDao(db.settingsDao(), encryptionManager)
 
     // ==================== Repositories ====================
     @Provides
